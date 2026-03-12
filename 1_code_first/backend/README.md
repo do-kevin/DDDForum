@@ -28,3 +28,9 @@ Apply migrations
 ```
 npx drizzle-kit migrate
 ```
+
+Drop migrations
+
+```
+npx drizzle-kit drop
+```
