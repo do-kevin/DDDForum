@@ -19,20 +19,66 @@ const db = drizzle(process.env.DATABASE_URL!);
 const app = new Hono();
 
 app.get("/users", async (context) => {
-  const users = await db.select().from(usersTable);
+  try {
+    const users = await db.select().from(usersTable);
 
-  const safeUsers = users.map(({ password, ...dataWithoutPassword }) => {
-    return dataWithoutPassword;
-  });
+    if (context.req.query("email")) {
+      let email = context.req.query("email") || "";
 
-  return context.json({
-    error: null,
-    data: safeUsers,
-    success: true,
-  });
+      const returnedUsers = await db
+        .select()
+        .from(usersTable)
+        .where(eq(usersTable.email, email))
+        .limit(1);
+
+      if (!returnedUsers.length) {
+        return context.json(
+          {
+            error: errors.UserNotFound,
+            data: null,
+            success: false,
+          },
+          404
+        );
+      }
+
+      const { password, ...returnedUserWithNoPassword } = returnedUsers[0];
+
+      return context.json(
+        {
+          error: null,
+          data: returnedUserWithNoPassword,
+          success: true,
+        },
+        200
+      );
+    }
+
+    const safeUsers = users.map(({ password, ...dataWithoutPassword }) => {
+      return dataWithoutPassword;
+    });
+
+    return context.json(
+      {
+        error: null,
+        data: safeUsers,
+        success: true,
+      },
+      200
+    );
+  } catch (error) {
+    return context.json(
+      {
+        error: errors.ServerError,
+        data: null,
+        success: false,
+      },
+      409
+    );
+  }
 });
 
-app.post("/users", async (context) => {
+app.post("/users/new", async (context) => {
   const body = await context.req.parseBody();
 
   const hashedPassword = await argon2.hash(generatePassword());
