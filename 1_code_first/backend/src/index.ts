@@ -67,74 +67,111 @@ app.get("/users", async (context) => {
       200
     );
   } catch (error) {
+    console.log(error);
     return context.json(
       {
         error: errors.ServerError,
         data: null,
         success: false,
       },
-      409
+      500
     );
   }
 });
 
 app.post("/users/new", async (context) => {
-  const body = await context.req.parseBody();
+  try {
+    const requiredFields = [
+      "username",
+      "first_name",
+      "last_name",
+      "email",
+      "password",
+    ];
+    let isValid = true;
+    const body = await context.req.parseBody();
 
-  const hashedPassword = await argon2.hash(generatePassword());
+    for (const field of requiredFields) {
+      if (!(field in body) || !body[field]) {
+        isValid = false;
+        break;
+      }
+    }
 
-  const user: typeof usersTable.$inferInsert = {
-    username: body["username"] as string,
-    first_name: body["first_name"] as string,
-    last_name: body["last_name"] as string,
-    email: body["email"] as string,
-    password: hashedPassword,
-  };
+    if (!isValid) {
+      return context.json(
+        {
+          error: errors.ValidationError,
+          data: null,
+          success: false,
+        },
+        400
+      );
+    }
 
-  const doesEmailExist = await db
-    .select()
-    .from(usersTable)
-    .where(eq(usersTable.email, user.email))
-    .limit(1);
+    const hashedPassword = await argon2.hash(generatePassword());
 
-  if (doesEmailExist.length) {
+    const user: typeof usersTable.$inferInsert = {
+      username: body["username"] as string,
+      first_name: body["first_name"] as string,
+      last_name: body["last_name"] as string,
+      email: body["email"] as string,
+      password: hashedPassword,
+    };
+
+    const [doesEmailExist, doesUserNameExist] = await Promise.all([
+      db
+        .select()
+        .from(usersTable)
+        .where(eq(usersTable.email, user.email))
+        .limit(1),
+      db
+        .select()
+        .from(usersTable)
+        .where(eq(usersTable.username, user.username))
+        .limit(1),
+    ]);
+
+    if (doesEmailExist.length || doesUserNameExist.length) {
+      let existenceError = errors.EmailAlreadyInUse;
+
+      if (doesUserNameExist) {
+        existenceError = errors.UsernameAlreadyTaken;
+      }
+
+      return context.json(
+        {
+          error: existenceError,
+          data: null,
+          success: false,
+        },
+        409
+      );
+    }
+
+    const [result] = await db.insert(usersTable).values(user).returning();
+
+    const { password, ...userDataWithoutPassword } = result;
+
     return context.json(
       {
-        error: errors.EmailAlreadyInUse,
+        error: null,
+        data: userDataWithoutPassword,
+        success: true,
+      },
+      201
+    );
+  } catch (error) {
+    console.log(error);
+    return context.json(
+      {
+        error: errors.ServerError,
         data: null,
         success: false,
       },
-      409
+      500
     );
   }
-
-  const doesUserNameExist = await db
-    .select()
-    .from(usersTable)
-    .where(eq(usersTable.username, user.username))
-    .limit(1);
-
-  if (doesUserNameExist.length) {
-    return context.json(
-      {
-        error: errors.UserNameAlreadyInUse,
-        data: null,
-        success: false,
-      },
-      409
-    );
-  }
-
-  const result = await db.insert(usersTable).values(user).returning();
-
-  return context.json(
-    {
-      error: null,
-      data: result,
-      success: true,
-    },
-    201
-  );
 });
 
 app.put("/users/edit/:userId", async (context) => {
@@ -182,11 +219,15 @@ app.put("/users/edit/:userId", async (context) => {
       201
     );
   } catch (error) {
-    return context.json({
-      error: errors.ServerError,
-      data: null,
-      success: false,
-    });
+    console.log(error);
+    return context.json(
+      {
+        error: errors.ServerError,
+        data: null,
+        success: false,
+      },
+      500
+    );
   }
 });
 
