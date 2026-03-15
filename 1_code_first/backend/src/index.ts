@@ -6,11 +6,13 @@ import { Hono } from "hono";
 
 import { config } from "dotenv";
 import { generatePassword } from "./shared/helper";
+import errors from "./shared/constants/errors";
 import * as argon2 from "argon2";
+import chalk from "chalk";
 
 config({ path: [".env.local", ".env", ".envrc"] });
 
-console.log("url: ", process.env.DATABASE_URL);
+console.log(chalk.blue("url: ", process.env.DATABASE_URL));
 
 const db = drizzle(process.env.DATABASE_URL!);
 
@@ -19,9 +21,13 @@ const app = new Hono();
 app.get("/users", async (context) => {
   const users = await db.select().from(usersTable);
 
+  const safeUsers = users.map(({ password, ...dataWithoutPassword }) => {
+    return dataWithoutPassword;
+  });
+
   return context.json({
     error: null,
-    data: users,
+    data: safeUsers,
     success: true,
   });
 });
@@ -48,7 +54,7 @@ app.post("/users", async (context) => {
   if (doesEmailExist.length) {
     return context.json(
       {
-        error: "EmailAlreadyInUse",
+        error: errors.EmailAlreadyInUse,
         data: null,
         success: false,
       },
@@ -65,7 +71,7 @@ app.post("/users", async (context) => {
   if (doesUserNameExist.length) {
     return context.json(
       {
-        error: "UserNameAlreadyInUse",
+        error: errors.UserNameAlreadyInUse,
         data: null,
         success: false,
       },
@@ -83,6 +89,59 @@ app.post("/users", async (context) => {
     },
     201
   );
+});
+
+app.put("/users/edit/:userId", async (context) => {
+  try {
+    let data = await context.req.parseBody();
+
+    let userId: number = Number(await context.req.param().userId);
+
+    const doesUserIdExist = await db
+      .select()
+      .from(usersTable)
+      .where(eq(usersTable.id, userId))
+      .limit(1);
+
+    if (!doesUserIdExist.length) {
+      return context.json(
+        {
+          error: errors.UserNotFound,
+          data: null,
+          success: false,
+        },
+        409
+      );
+    }
+
+    if ("password" in data) {
+      data = {
+        ...data,
+        password: await argon2.hash(data["password"] as string),
+      };
+    }
+
+    let [{ password, ...updatedUserWithoutPassword }] = await db
+      .update(usersTable)
+      .set(data)
+      .where(eq(usersTable.id, userId))
+      .returning();
+
+    return context.json(
+      {
+        error: null,
+        data: updatedUserWithoutPassword,
+        success: true,
+      },
+      201
+    );
+  } catch (error) {
+    return context.json({
+      error: errors.ServerError,
+      data: null,
+      success: false,
+    });
+  }
 });
 
 export default app;
