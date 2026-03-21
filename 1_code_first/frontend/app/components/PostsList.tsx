@@ -46,7 +46,7 @@ export const PostsList = ({ posts }: { posts: Post[] }) => {
               <div className="post-item-title">{post.title}</div>
               <div className="post-item-details">
                 <div>{dayjs(post.date_created).fromNow(true)}</div>
-                <Link to={`/member${post.member_posted_by.user.username}`}>
+                <Link to={`/member/${post.member_posted_by.user.username}`}>
                   by {post.member_posted_by.user.username}
                 </Link>
                 <div>
