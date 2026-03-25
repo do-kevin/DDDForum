@@ -8,6 +8,7 @@ import {
 } from "react-router";
 import { TanStackDevtools } from "@tanstack/react-devtools";
 import { formDevtoolsPlugin } from "@tanstack/react-form-devtools";
+import { Toaster } from "sonner";
 
 import type { Route } from "./+types/root";
 import "./app.css";
@@ -38,6 +39,18 @@ export function Layout({ children }: { children: React.ReactNode }) {
         {children}
         <ScrollRestoration />
         <Scripts />
+        <Toaster
+          toastOptions={{
+            unstyled: true,
+            classNames: {
+              toast: "alert",
+              success: "alert-success",
+              error: "alert-error",
+              info: "alert-info",
+              warning: "alert-warning",
+            },
+          }}
+        />
       </body>
     </html>
   );
