@@ -1,5 +1,7 @@
 import logo from "assets/dddforumlogo.png";
-import { Link, useLocation } from "react-router";
+import { useEffect, type MouseEvent } from "react";
+import { Link, useLocation, useNavigate } from "react-router";
+import { useUser } from "~/contexts/usersContext";
 
 const Logo = () => {
   return (
@@ -20,14 +22,32 @@ const TitleAndSubmission = () => {
 };
 
 const HeaderActionButton = ({ user }: { user: any }) => {
+  const { setUser } = useUser();
+  const navigate = useNavigate();
+
+  useEffect(() => {}, user);
+
+  const handleLoginButton = (event: MouseEvent<HTMLButtonElement>) => {
+    console.log(user);
+    if (!user.username) {
+      navigate("/register");
+      return null;
+    }
+
+    event?.preventDefault();
+    event?.stopPropagation();
+    setUser(null);
+  };
+
   return (
     <div id="header-action-button">
       {user ? (
         <div>
           {user.username}
-          <u>
-            <div>logout</div>
-          </u>
+          <br />
+          <button className="btn" onClick={handleLoginButton}>
+            {user.username ? "Logout" : "Register"}
+          </button>
         </div>
       ) : (
         <Link to="/join">join</Link>
@@ -42,6 +62,9 @@ const shouldShowActionButton = (pathName: string) => {
 
 export default function Header({ pathName }: { pathName: string }) {
   const location = useLocation();
+  const { user } = useUser();
+
+  useEffect(() => {}, [user]);
 
   return (
     <header
@@ -52,7 +75,7 @@ export default function Header({ pathName }: { pathName: string }) {
       <Logo />
       <TitleAndSubmission />
       {shouldShowActionButton(location.pathname) ? (
-        <HeaderActionButton user={{ username: "@john" }} />
+        <HeaderActionButton user={{ username: user?.userName }} />
       ) : (
         ""
       )}

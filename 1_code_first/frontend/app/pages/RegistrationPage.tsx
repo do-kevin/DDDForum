@@ -9,6 +9,11 @@ import type {
 import { userGateway } from "~/controllers/user.gateway";
 import { toast } from "sonner";
 import { isAxiosError } from "axios";
+import { useUser } from "~/contexts/usersContext";
+import { OverlaySpinner } from "~/components/overlaySpinner";
+import { useSpinner } from "~/contexts/spinnerContext";
+import { useEffect } from "react";
+import { useNavigate } from "react-router";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -49,42 +54,64 @@ const validateForm = (input: UserRegistrationInput): UserValidationResult => {
   return { success: isSuccess, errorMessage: errorMessages };
 };
 
-const handleRegistration = async (submission: UserSubmissionObject) => {
-  try {
-    const { value } = submission;
-    const result = validateForm(value);
-
-    if (!result.success) {
-      return {
-        form: "Invalid data",
-        fields: result.errorMessage,
-      };
-    }
-
-    const newResult = await userGateway.register(value);
-
-    if (newResult.status === 201 && newResult.data.success) {
-      toast.success("Registration successful!");
-    }
-
-    return null;
-  } catch (error) {
-    if (isAxiosError(error)) {
-      const message = error.response?.data?.error || "Something went wrong";
-      console.log("server error:", error.response?.data);
-      toast.error(message);
-      return { form: message };
-    }
-    return { form: "Unexpected error" };
-  }
-};
-
 const RegistrationPage = () => {
+  const { user, setUser } = useUser();
+  const spinner = useSpinner();
+  const navigate = useNavigate();
+
+  const handleRegistration = async (submission: UserSubmissionObject) => {
+    spinner.activate();
+    try {
+      const { value } = submission;
+      const result = validateForm(value);
+
+      if (!result.success) {
+        return {
+          form: "Invalid data",
+          fields: result.errorMessage,
+        };
+      }
+
+      const response = await userGateway.register(value);
+
+      if (response.status === 201 && response.data.success) {
+        toast.success("Registration successful!");
+      }
+
+      setUser({
+        userName: response.data.data.username,
+        firstName: response.data.data.first_name,
+        lastName: response.data.data.last_name,
+        email: response.data.data.email,
+      });
+
+      setTimeout(() => {
+        navigate("/");
+      }, 3000);
+
+      return null;
+    } catch (error) {
+      if (isAxiosError(error)) {
+        const message = error.response?.data?.error || "Something went wrong";
+        console.log("server error:", error.response?.data);
+        toast.error(message);
+        spinner.deactivate();
+        return { form: message };
+      }
+
+      spinner.deactivate();
+      return { form: "Unexpected error" };
+    }
+  };
+
+  useEffect(() => {}, [user]);
+
   return (
     <Layout>
       <div className="m-auto">
         <RegistrationForm onSubmit={handleRegistration} />
       </div>
+      <OverlaySpinner isActive={spinner.spinner?.isActive} />
     </Layout>
   );
 };
