@@ -5,15 +5,16 @@ import type {
   UserRegistrationInput,
   UserValidationResult,
   UserSubmissionObject,
+  User,
 } from "~/shared/user.types";
 import { userGateway } from "~/controllers/user.gateway";
 import { toast } from "sonner";
 import { isAxiosError } from "axios";
 import { useUser } from "~/contexts/usersContext";
-import { OverlaySpinner } from "~/components/overlaySpinner";
 import { useSpinner } from "~/contexts/spinnerContext";
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
+import { OverlaySpinner } from "~/components/OverlaySpinner";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -78,12 +79,15 @@ const RegistrationPage = () => {
         toast.success("Registration successful!");
       }
 
-      setUser({
+      const programmersModel = {
+        id: response.data.data.id,
         userName: response.data.data.username,
         firstName: response.data.data.first_name,
         lastName: response.data.data.last_name,
         email: response.data.data.email,
-      });
+      };
+
+      setUser(programmersModel);
 
       setTimeout(() => {
         navigate("/");

@@ -25,10 +25,9 @@ const HeaderActionButton = ({ user }: { user: any }) => {
   const { setUser } = useUser();
   const navigate = useNavigate();
 
-  useEffect(() => {}, user);
+  useEffect(() => {}, [user]);
 
   const handleLoginButton = (event: MouseEvent<HTMLButtonElement>) => {
-    console.log(user);
     if (!user.username) {
       navigate("/register");
       return null;

@@ -1,7 +1,7 @@
 import { useForm } from "@tanstack/react-form";
 import type { User } from "~/shared/user.types";
 
-const defaultUser: User = {
+const defaultUser: Omit<User, "id"> = {
   email: "",
   firstName: "",
   lastName: "",

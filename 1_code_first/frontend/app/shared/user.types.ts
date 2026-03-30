@@ -1,6 +1,7 @@
 import type { AnyFormApi } from "@tanstack/react-form";
 
 export interface User {
+  id: number;
   email: string;
   firstName: string;
   lastName: string;

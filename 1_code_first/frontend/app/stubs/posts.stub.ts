@@ -1,56 +1,58 @@
-import type { Post } from "~/components/PostsList";
+import type { PostWithDetails } from "~/shared/post.types";
 
-export const getPostsStub = (): Post[] => {
+export const getPostsStub = (): PostWithDetails[] => {
   return [
     {
-      title: "First post",
-      date_created: "2023-07-10T08:20:22.243Z",
+      id: 1,
+      title: "First post!",
+      content: "This is bob vances first post",
+      post_type: "Text",
+      member_id: 1,
+      date_created: "2026-03-29T17:48:00.647Z",
       member_posted_by: {
+        id: 1,
+        user_id: 1,
         user: {
-          username: "@john",
+          id: 1,
+          userName: "bobvance",
+          firstName: "Bob",
+          lastName: "Vance",
+          email: "bobvance@gmail.com",
+          password: "",
         },
       },
-      comments: [],
+      comments: [
+        {
+          id: 1,
+          post_id: 1,
+          member_id: 1,
+          text: "I posted this!",
+          parent_comment_id: null,
+          date_created: "2026-03-29T17:48:00.649Z",
+          member_posted_by: {
+            id: 1,
+            user_id: 1,
+            user: {
+              id: 1,
+              userName: "bobvance",
+              firstName: "Bob",
+              lastName: "Vance",
+              email: "bobvance@gmail.com",
+              password: "",
+            },
+          },
+        },
+      ],
       votes: [
         {
           id: 1,
           post_id: 1,
+          member_id: 1,
+          member_posted_by: 1,
           vote_type: "Upvote",
+          date_created: "2026-03-29T17:48:00.648Z",
         },
       ],
-    },
-    {
-      title: "Second post",
-      date_created: "2023-07-11T08:20:22.243Z",
-      member_posted_by: {
-        user: {
-          username: "@kevin",
-        },
-      },
-      comments: [],
-      votes: [
-        {
-          id: 1,
-          post_id: 2,
-          vote_type: "Downvote",
-        },
-        {
-          id: 2,
-          post_id: 2,
-          vote_type: "Downvote",
-        },
-      ],
-    },
-    {
-      title: "Third post",
-      date_created: "2023-07-14T08:20:22.243Z",
-      member_posted_by: {
-        user: {
-          username: "@john",
-        },
-      },
-      comments: [],
-      votes: [],
     },
   ];
 };

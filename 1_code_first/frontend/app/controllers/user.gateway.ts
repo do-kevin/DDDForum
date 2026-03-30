@@ -9,7 +9,7 @@ class UserGateway {
     this.api = axios.create({
       baseURL: "http://localhost:3000",
       headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Type": "application/json",
       },
     });
   }
@@ -19,7 +19,7 @@ class UserGateway {
   };
 
   register = async (input: UserRegistrationInput) => {
-    const data = {
+    const dto = {
       username: input.userName,
       email: input.email,
       last_name: input.lastName,
@@ -27,7 +27,7 @@ class UserGateway {
       password: input.password,
     };
 
-    return this.api.post("/users/new", data);
+    return this.api.post("/users/new", dto);
   };
 }
 
