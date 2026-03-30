@@ -59,6 +59,7 @@ export const postsRelations = relations(postsTable, ({ one, many }) => ({
     references: [membersTable.id],
   }),
   comments: many(commentsTable),
+  votes: many(votesTable),
 }));
 
 export const commentsTable = pgTable("comments", {
