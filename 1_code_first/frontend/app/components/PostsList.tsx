@@ -2,6 +2,7 @@ import arrow from "assets/arrow.svg";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { Link } from "react-router";
+import type { PostWithDetails } from "~/shared/post.types";
 
 dayjs.extend(relativeTime);
 
@@ -27,9 +28,9 @@ function computeVoteCount(votes: Vote[]) {
   return count;
 }
 
-export const PostsList = ({ posts }: { posts: Post[] }) => {
+export const PostsList = ({ posts }: { posts: PostWithDetails[] }) => {
   return (
-    <div className="posts-list" style={{ border: "3px solid red" }}>
+    <div className="posts-list">
       {posts.map((post, key) => {
         return (
           <div className="post-item mb-6" key={key}>
@@ -46,9 +47,16 @@ export const PostsList = ({ posts }: { posts: Post[] }) => {
               <div className="post-item-title">{post.title}</div>
               <div className="post-item-details">
                 <div>{dayjs(post.date_created).fromNow(true)}</div>
-                <Link to={`/member/${post.member_posted_by.user.username}`}>
-                  by {post.member_posted_by.user.username}
-                </Link>
+                <div className="inline-block">
+                  by{" "}
+                  <Link
+                    to={`/member/${post.member_posted_by.user.username}`}
+                    className="underline text-blue-700"
+                  >
+                    {post.member_posted_by.user.username}
+                  </Link>
+                </div>
+
                 <div>
                   {post.comments.length}{" "}
                   {post.comments.length !== 1 ? `comments` : "comment"}

@@ -20,14 +20,14 @@ class UserGateway {
 
   register = async (input: UserRegistrationInput) => {
     const dto = {
-      username: input.userName,
+      username: input.username,
       email: input.email,
       last_name: input.lastName,
       first_name: input.firstName,
       password: input.password,
     };
 
-    return this.api.post("/users/new", dto);
+    return this.api.post("/users/new", JSON.stringify(dto));
   };
 }
 

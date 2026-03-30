@@ -14,7 +14,7 @@ export const getPostsStub = (): PostWithDetails[] => {
         user_id: 1,
         user: {
           id: 1,
-          userName: "bobvance",
+          username: "bobvance",
           firstName: "Bob",
           lastName: "Vance",
           email: "bobvance@gmail.com",
@@ -34,7 +34,7 @@ export const getPostsStub = (): PostWithDetails[] => {
             user_id: 1,
             user: {
               id: 1,
-              userName: "bobvance",
+              username: "bobvance",
               firstName: "Bob",
               lastName: "Vance",
               email: "bobvance@gmail.com",

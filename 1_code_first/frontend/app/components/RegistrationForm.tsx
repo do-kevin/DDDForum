@@ -5,7 +5,7 @@ const defaultUser: Omit<User, "id"> = {
   email: "",
   firstName: "",
   lastName: "",
-  userName: "",
+  username: "",
   password: "",
 };
 
@@ -31,7 +31,7 @@ const RegistrationForm = ({ onSubmit }: { onSubmit: any }) => {
     >
       <div className="mb-3">
         <Field
-          name="userName"
+          name="username"
           children={(field) => {
             return (
               <>

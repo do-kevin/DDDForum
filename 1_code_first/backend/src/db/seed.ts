@@ -17,8 +17,6 @@ const pool = new Pool({
 
 const db = drizzle(pool);
 
-console.log("URL: ", process.env.DATABASE_URL);
-
 const initialUsers = [
   {
     email: "bobvance@gmail.com",

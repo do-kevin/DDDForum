@@ -73,7 +73,7 @@ class UsersController {
         "password",
       ];
       let isValid = true;
-      const body = await context.req.parseBody();
+      const body = await context.req.json();
 
       for (const field of requiredFields) {
         if (!(field in body) || !body[field]) {
@@ -152,7 +152,7 @@ class UsersController {
 
   editUser = async (context: Context, _next: Next) => {
     try {
-      let data = await context.req.parseBody();
+      let data = await context.req.json();
 
       let userId: number = Number(await context.req.param().userId);
 

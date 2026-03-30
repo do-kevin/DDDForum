@@ -5,7 +5,6 @@ import type {
   UserRegistrationInput,
   UserValidationResult,
   UserSubmissionObject,
-  User,
 } from "~/shared/user.types";
 import { userGateway } from "~/controllers/user.gateway";
 import { toast } from "sonner";
@@ -32,9 +31,9 @@ const validateForm = (input: UserRegistrationInput): UserValidationResult => {
     errorMessages = { ...errorMessages, email: "Email invalid" };
   }
 
-  if (input.userName.length < 2) {
+  if (input.username.length < 2) {
     isSuccess = false;
-    errorMessages = { ...errorMessages, userName: "Username invalid" };
+    errorMessages = { ...errorMessages, username: "Username invalid" };
   }
 
   if (input.firstName.length < 2) {
@@ -76,12 +75,12 @@ const RegistrationPage = () => {
       const response = await userGateway.register(value);
 
       if (response.status === 201 && response.data.success) {
-        toast.success("Registration successful!");
+        toast.success("Registration successful! Redirecting home in 3 seconds");
       }
 
       const programmersModel = {
         id: response.data.data.id,
-        userName: response.data.data.username,
+        username: response.data.data.username,
         firstName: response.data.data.first_name,
         lastName: response.data.data.last_name,
         email: response.data.data.email,
@@ -95,6 +94,7 @@ const RegistrationPage = () => {
 
       return null;
     } catch (error) {
+      console.log("error: ", error);
       if (isAxiosError(error)) {
         const message = error.response?.data?.error || "Something went wrong";
         console.log("server error:", error.response?.data);

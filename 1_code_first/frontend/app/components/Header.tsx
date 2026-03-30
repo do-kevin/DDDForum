@@ -14,9 +14,13 @@ const Logo = () => {
 const TitleAndSubmission = () => {
   return (
     <div id="title-container">
-      <h1>Domain-Driven Designers</h1>
-      <h3>Where awesome domain driven designers are made</h3>
-      <Link to={"/submit"}>submit</Link>
+      <h1 className="text-2xl/7 font-bold">Domain-Driven Designers</h1>
+      <h3 className="font-bold">
+        Where awesome domain driven designers are made
+      </h3>
+      <Link to={"/submit"} className="underline text-blue-700">
+        submit
+      </Link>
     </div>
   );
 };
@@ -43,9 +47,12 @@ const HeaderActionButton = ({ user }: { user: any }) => {
       {user ? (
         <div>
           {user.username}
-          <br />
-          <button className="btn" onClick={handleLoginButton}>
-            {user.username ? "Logout" : "Register"}
+          {user.username && <br />}
+          <button
+            className="btn btn-neutral rounded-none"
+            onClick={handleLoginButton}
+          >
+            {user.username ? "Logout" : "Join"}
           </button>
         </div>
       ) : (
@@ -66,18 +73,16 @@ export default function Header({ pathName }: { pathName: string }) {
   useEffect(() => {}, [user]);
 
   return (
-    <header
-      id="header"
-      className="flex items-center justify-between"
-      style={{ border: "3px solid magenta" }}
-    >
-      <Logo />
-      <TitleAndSubmission />
-      {shouldShowActionButton(location.pathname) ? (
-        <HeaderActionButton user={{ username: user?.userName }} />
-      ) : (
-        ""
-      )}
+    <header id="header" className="flex items-center justify-between">
+      <div className="flex items-center  ml-4 mr-auto justify-between gap-4">
+        <Logo />
+        <TitleAndSubmission />
+        {shouldShowActionButton(location.pathname) ? (
+          <HeaderActionButton user={{ username: user?.username }} />
+        ) : (
+          ""
+        )}
+      </div>
     </header>
   );
 }

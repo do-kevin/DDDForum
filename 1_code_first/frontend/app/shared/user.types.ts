@@ -5,7 +5,7 @@ export interface User {
   email: string;
   firstName: string;
   lastName: string;
-  userName: string;
+  username: string;
   password: string;
 }
 
@@ -17,7 +17,7 @@ export type UserValidationResult = {
     email?: string;
     firstName?: string;
     lastName?: string;
-    userName?: string;
+    username?: string;
     password?: string;
   };
 };

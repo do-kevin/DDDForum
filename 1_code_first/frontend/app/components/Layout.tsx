@@ -6,10 +6,7 @@ export const Content = ({ children }: any) => {
 
 export default function Layout({ children }: any) {
   return (
-    <main
-      className="flex flex-col mx-auto w-full max-w-5xl"
-      style={{ border: "4px solid blue" }}
-    >
+    <main className="flex flex-col mx-auto w-full max-w-6xl p-4 box-border bg-slate-50">
       <Header pathName={"/"} />
       <Content>{children}</Content>
     </main>

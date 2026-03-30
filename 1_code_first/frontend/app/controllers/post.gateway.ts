@@ -14,9 +14,11 @@ class PostGateway {
       },
     });
   }
-
   getRecentPosts = async () => {
-    return this.api.get<ApiResponse<PostWithDetails[]>>("/posts/all");
+    return this.api.get<ApiResponse<PostWithDetails[]>>("/posts?sort=recent");
+  };
+  getPopularPosts = async () => {
+    return this.api.get<ApiResponse<PostWithDetails[]>>("/posts");
   };
 }
 
